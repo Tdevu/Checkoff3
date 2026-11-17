@@ -2,33 +2,42 @@
 
 **Tanuj Devulapalli · COMP 211 (Systems Fundamentals), UNC Chapel Hill · Checkoff 3**
 
-In COMP 211 we use `^` with a mask to toggle bits. For this checkoff I explored how that same operator can hide a message, and how easily that kind of encryption breaks.
+In COMP 211, we already touched on XOR when we used it to toggle flag bits, so for this checkoff I wanted to see how that same simple operation can be used to hide messages and how securely it does this, essentially the idea of encryption.
 
-## What I explored
+## What I looked into
 
-- **How XOR encryption works.** `cipher = plain ^ key` and `plain = cipher ^ key`. Encrypting and decrypting are the same operation with the same key.
-- **Why decrypting works.** `(x ^ k) ^ k = x ^ (k ^ k) = x ^ 0 = x`. The key is a mask: every 1 bit flips a data bit, and flipping it a second time restores it.
-- **How to break it.** A one-byte key has only 2⁸ = 256 possible values, so a program can try every one and pick the output that looks most like English.
-- **C pitfalls.** A ciphertext byte can be `0x00`, which breaks `strlen` and `printf("%s")`. A signed `char` with its top bit set sign-extends when printed.
-- **When XOR is secure.** The one-time pad: a truly random key, as long as the message, never reused.
+I looked into the basic process of encrypting and decrypting and how plugging in the key does both. (plain ^ key = cipher & cipher ^ key = plain)
 
-## Most interesting discoveries
+Why decrypting works. (x ^ k) ^ k = x ^ (k ^ k) = x ^ 0 = x
 
-1. **XOR with a space flips a letter's case.** A space is `0x20` (only bit 5 set), and bit 5 is the only difference between `'a'` (`0110 0001`) and `'A'` (`0100 0001`).
-2. **Brute force doesn't always work on short messages.** `"BEAT DUKE"` cracked correctly, but `"hi"` picked the wrong key, because with only 2 letters many keys tie on score.
-3. **Ciphertext is raw bytes, not a string.** With `"Go Heels!"` and key `"Zo"`, `'o' ^ 'o' = 0x00`, so `strlen` reports 1 instead of 9 and decrypting with that length gives back only `"G"`.
-4. **XOR itself isn't the weak part. The key is.** With a one-time pad, the ciphertext `01 06 17 69` decrypts to `UNC!` with one key and to `DUKE` with another, so an attacker learns nothing. Modern ciphers like AES-CTR and ChaCha20 still use XOR; they generate a long keystream from a short key.
+How to actually crack the code. This was fun to do as I realized that it's actually much simpler to think about, as there are such a low number of options for keys. (2^8 = 256)
+
+Some C problems that occurred were the ideas of a ciphertext byte being 0. C reads this as the end of the word and breaks strlen and print("%s").
+
+Lastly, I looked at when XOR is actually secure: when the key is truly random, as long as the message it is encrypting and is never reused.
+
+## Things that surprised me
+
+**XOR with a space flips a case**
+A space is only 0x20, which only has a 5-bit set, and bit 5 is the only difference between lowercase and uppercase letters.
+
+**Brute force fails with short messages**
+Shorter messages can pick multiple keys that have the same tied score due to the small size.
+
+
+**The key is the weak part, not XOR**
+The difference in the complexities of the key, such as size, uniqueness, and how it can decrypt to other plausible words, creates the factors of how secure the encryption is.
 
 ## Code examples
 
-All programs are in [`src/`](src). Each one compiles with no warnings.
+All programs are in [`src/`](src). <!-- note on compiling with no warnings -->
 
 | Program | What it shows |
 |---|---|
-| `xor_basic.c` | Encrypting and decrypting `"Go Heels!"` with the repeating key `"UNC"`, using one function for both |
-| `strlen_bug.c` | A `0x00` byte in the ciphertext breaks `strlen` |
+| `xor_basic.c` | Encrypting and decrypting "Go Heels!" with the repeating key "UNC", using one function for both |
+| `strlen_bug.c` | How a 0x00 byte in the ciphertext breaks strlen |
 | `brute_force.c` | Cracking a single-byte XOR key by trying all 256 keys and scoring each output |
-| `signed_char.c` | Why raw bytes should be `unsigned char` (`0xE9` prints as `ffffffe9` when signed) |
+| `signed_char.c` | Why raw bytes should be unsigned char (0xE9 prints as ffffffe9 when signed) |
 
 ### How to run
 
@@ -80,9 +89,9 @@ signed, cast:  %02x = e9
 
 ### What I changed and tested
 
-- Used my own messages and keys (`"Go Heels!"`, `"UNC"`, `"BEAT DUKE"`).
-- Designed my own null-byte case for `strlen_bug.c` (`"Go Heels!"` with key `"Zo"`).
-- Tested `brute_force.c` on different inputs (normal, all caps, very short) to find where it fails.
+- I swapped in my own messages and keys ("Go Heels!", "UNC", "BEAT DUKE").
+- I came up with my own null-byte case for strlen_bug.c ("Go Heels!" with key "Zo").
+- I ran brute_force.c on a few different kinds of input (normal, all caps, really short) to see where it starts to fail.
 
 ## Presentation
 
@@ -90,10 +99,10 @@ Slides: [`slides/XOR_Encryption.pdf`](slides/XOR_Encryption.pdf)
 
 ## How I used AI
 
-I learned this topic through a conversation with Claude, where I tested its claims by running code, explained concepts back in my own words, and corrected it when it misunderstood me.
+I learned this topic using Claude, where I started with the background and conceptual ideas, then progressed to seeing it in code. I was able to learn through reclarifying, looking through the examples and doing them on my own, and lastly explaining the same concepts back in my own words and checking if I missed anything.
 
 - AI conversation: https://claude.ai/share/0920fbca-9b0d-495d-9d61-be8f3035d26b
-- The code examples were written with help from Claude (Anthropic), then run, modified, and tested by me.
+- The code examples were written with help from Claude (Anthropic), and then I ran, modified, and tested them myself.
 
 ## Resources
 
