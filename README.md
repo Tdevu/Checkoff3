@@ -93,7 +93,7 @@ Slides: [`slides/XOR_Encryption.pdf`](slides/XOR_Encryption.pdf)
 I learned this topic through a conversation with Claude, where I tested its claims by running code, explained concepts back in my own words, and corrected it when it misunderstood me.
 
 - AI conversation: https://claude.ai/share/0920fbca-9b0d-495d-9d61-be8f3035d26b
-- The code examples were written with help from Claude (Anthropic), with my TA's approval, then run, modified, and tested by me.
+- The code examples were written with help from Claude (Anthropic), then run, modified, and tested by me.
 
 ## Resources
 
