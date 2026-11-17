@@ -1,0 +1,7 @@
+# compiled programs
+xor_basic
+strlen_bug
+brute_force
+signed_char
+*.o
+.DS_Store
